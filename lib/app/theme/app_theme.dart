@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color background = Color(0xFF111320);
-  static const Color surface = Color(0xFF1E2235);
-  static const Color surfaceAlt = Color(0xFF272B42);
-  static const Color border = Color(0xFF2D3148);
-  static const Color primary = Color(0xFFD7263D);
-  static const Color primarySoft = Color(0xFFFF5A66);
-  static const Color textPrimary = Color(0xFFF5F7FF);
-  static const Color textSecondary = Color(0xFFAAB0C5);
+  // Modern blue color scheme following mockup
+  static const Color background = Color(0xFFF8F9FA);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surfaceAlt = Color(0xFFF5F5F5);
+  static const Color border = Color(0xFFE5E7EB);
+  static const Color primary = Color(0xFF1976D2);
+  static const Color primarySoft = Color(0xFF2196F3);
+  static const Color textPrimary = Color(0xFF111820);
+  static const Color textSecondary = Color(0xFF6B7280);
 
   static ThemeData get dark {
-    final ColorScheme scheme = ColorScheme.dark(
+    final ColorScheme scheme = ColorScheme.light(
       primary: primary,
       secondary: primarySoft,
       surface: surface,
@@ -22,7 +23,7 @@ class AppTheme {
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       colorScheme: scheme,
       scaffoldBackgroundColor: background,
       canvasColor: background,
@@ -31,12 +32,12 @@ class AppTheme {
         backgroundColor: surface,
         foregroundColor: textPrimary,
         elevation: 0,
-        centerTitle: true,
+        centerTitle: false,
       ),
       cardTheme: CardThemeData(
         color: surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(12),
           side: const BorderSide(color: border),
         ),
       ),
@@ -54,7 +55,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: primarySoft, width: 1.2),
+          borderSide: const BorderSide(color: primarySoft, width: 1.5),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -62,7 +63,7 @@ class AppTheme {
           backgroundColor: primary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
           ),
         ),
       ),
@@ -72,8 +73,8 @@ class AppTheme {
         ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: surfaceAlt,
-        contentTextStyle: const TextStyle(color: textPrimary),
+        backgroundColor: textPrimary,
+        contentTextStyle: const TextStyle(color: Colors.white),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
