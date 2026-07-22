@@ -9,6 +9,7 @@ class FeedPost {
     required this.title,
     required this.description,
     required this.mediaIcons,
+    required this.imagePaths,
     required this.likes,
     required this.comments,
     required this.shares,
@@ -25,6 +26,7 @@ class FeedPost {
   final String title;
   final String description;
   final List<IconData> mediaIcons;
+  final List<String> imagePaths;
   final int likes;
   final int comments;
   final int shares;
@@ -41,6 +43,7 @@ class FeedPost {
     String? title,
     String? description,
     List<IconData>? mediaIcons,
+    List<String>? imagePaths,
     int? likes,
     int? comments,
     int? shares,
@@ -57,6 +60,7 @@ class FeedPost {
       title: title ?? this.title,
       description: description ?? this.description,
       mediaIcons: mediaIcons ?? this.mediaIcons,
+      imagePaths: imagePaths ?? this.imagePaths,
       likes: likes ?? this.likes,
       comments: comments ?? this.comments,
       shares: shares ?? this.shares,
@@ -76,6 +80,7 @@ class FeedPost {
       'title': title,
       'description': description,
       'mediaIcons': mediaIcons.map((icon) => icon.codePoint).toList(),
+      'imagePaths': imagePaths,
       'likes': likes,
       'comments': comments,
       'shares': shares,
@@ -88,21 +93,16 @@ class FeedPost {
 
   factory FeedPost.fromMap(Map<String, dynamic> map) {
     final dynamic rawMedia = map['mediaIcons'];
-    final List<IconData> parsedIcons = rawMedia is List
-        ? rawMedia
-              .map((value) {
-                if (value is int) {
-                  return IconData(value, fontFamily: 'MaterialIcons');
-                }
-                return null;
-              })
-              .whereType<IconData>()
-              .toList()
-        : <IconData>[];
+    final List<IconData> parsedIcons = <IconData>[];
 
     final dynamic rawComments = map['commentsList'];
     final List<String> parsedComments = rawComments is List
         ? rawComments.map((value) => value.toString()).toList()
+        : <String>[];
+
+    final dynamic rawImages = map['imagePaths'];
+    final List<String> parsedImagePaths = rawImages is List
+        ? rawImages.map((value) => value.toString()).toList()
         : <String>[];
 
     return FeedPost(
@@ -113,6 +113,7 @@ class FeedPost {
       title: map['title']?.toString() ?? '',
       description: map['description']?.toString() ?? '',
       mediaIcons: parsedIcons,
+      imagePaths: parsedImagePaths,
       likes: map['likes'] is int ? map['likes'] as int : 0,
       comments: map['comments'] is int ? map['comments'] as int : 0,
       shares: map['shares'] is int ? map['shares'] as int : 0,
