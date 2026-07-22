@@ -16,31 +16,42 @@ class BottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       backgroundColor: AppTheme.surface,
+      elevation: 8,
       currentIndex: currentIndex > 1 ? 3 : currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
       items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          activeIcon: Icon(Icons.home),
-          label: 'Home',
+          icon: Icon(Icons.home_outlined, size: 24),
+          activeIcon: Icon(Icons.home, size: 24),
+          label: 'Feed',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.explore_outlined),
+          icon: Icon(Icons.explore_outlined, size: 24),
+          activeIcon: Icon(Icons.explore, size: 24),
           label: 'Explore',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.mail_outline),
+          icon: Icon(Icons.mail_outlined, size: 24),
+          activeIcon: Icon(Icons.mail, size: 24),
           label: 'Messages',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          activeIcon: Icon(Icons.person),
+          icon: Icon(Icons.person_outlined, size: 24),
+          activeIcon: Icon(Icons.person, size: 24),
           label: 'Profile',
         ),
       ],
       selectedItemColor: AppTheme.primarySoft,
       unselectedItemColor: AppTheme.textSecondary,
+      selectedLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+      ),
+      unselectedLabelStyle: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 }

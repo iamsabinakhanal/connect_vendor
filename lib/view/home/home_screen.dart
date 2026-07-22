@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import '../../auth/auth_storage.dart';
 import '../../app/theme/app_theme.dart';
 import 'screens/home_feed_screen.dart';
@@ -19,7 +18,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-  String? _profileImagePath;
 
   static const List<String> _pageTitles = [
     'Home',
@@ -36,24 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _loadProfileImage();
-  }
-
-  Future<void> _loadProfileImage() async {
-    final String? path = await AuthStorage.getProfileImagePath();
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _profileImagePath = path;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final String pageTitle = _pageTitles[_currentIndex];
     final String pageSubtitle = _pageSubtitles[_currentIndex];
 
     return Scaffold(
@@ -62,51 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
         centerTitle: false,
         backgroundColor: AppTheme.surface,
         elevation: 0,
-        leading: Padding(
-          padding: EdgeInsets.all(8),
-          child: GestureDetector(
-            onTap: () => _showActionMessage('Profile logo tapped'),
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.surfaceAlt,
-                shape: BoxShape.circle,
-              ),
-              child: ClipOval(
-                child: _profileImagePath != null
-                    ? Image.file(
-                        File(_profileImagePath!),
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => Center(
-                          child: Text(
-                            'PG',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.primarySoft,
-                            ),
-                          ),
-                        ),
-                      )
-                    : Center(
-                        child: Text(
-                          'PG',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.primarySoft,
-                          ),
-                        ),
-                      ),
-              ),
-            ),
-          ),
-        ),
-        titleSpacing: 0,
+        leading: SizedBox.shrink(),
+        titleSpacing: 16,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              pageTitle,
+              'Connect Vendor',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -121,6 +64,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.search_outlined,
+              color: AppTheme.textPrimary,
+            ),
+            onPressed: () => _showActionMessage('Search tapped'),
+            tooltip: 'Search',
+          ),
           IconButton(
             icon: Icon(
               Icons.notifications_outlined,

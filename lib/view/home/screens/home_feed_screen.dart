@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../../../app/theme/app_theme.dart';
 import '../../../core/utils/local_database.dart';
 import '../../create_post_screen.dart';
@@ -51,6 +52,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
           Icons.workspace_premium,
           Icons.lightbulb,
         ],
+        imagePaths: [],
         likes: 234,
         comments: 45,
         shares: 12,
@@ -71,6 +73,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
         description:
             'Multi-port USB-C hub with HDMI, USB 3.0, and SD card reader. Perfect for MacBook and Windows laptops.',
         mediaIcons: [Icons.router, Icons.cable, Icons.memory],
+        imagePaths: [],
         likes: 567,
         comments: 89,
         shares: 34,
@@ -88,6 +91,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
         description:
             'Premium mechanical keyboard with customizable RGB lighting. Perfect for gaming and professional work.',
         mediaIcons: [Icons.keyboard, Icons.games],
+        imagePaths: [],
         likes: 892,
         comments: 156,
         shares: 78,
@@ -105,6 +109,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
         description:
             'Precision wireless mouse with ergonomic design. 12-month battery life and advanced tracking technology.',
         mediaIcons: [Icons.touch_app],
+        imagePaths: [],
         likes: 445,
         comments: 67,
         shares: 45,
@@ -151,97 +156,107 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          _buildCreatePostComposer(),
-          ..._feedPosts.map(_buildFeedPost),
-        ],
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: SafeArea(
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              elevation: 0,
+              backgroundColor: AppTheme.surface,
+              leading: SizedBox.shrink(),
+              title: Text(
+                'Feed',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.search, color: AppTheme.textPrimary),
+                  onPressed: () => _showActionMessage('Search tapped'),
+                ),
+              ],
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: 12)),
+            SliverToBoxAdapter(
+              child: _buildCreatePostComposer(),
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: 8)),
+            SliverToBoxAdapter(
+              child: _buildCommunitiesSection(),
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: 16)),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return _buildModernFeedPost(_feedPosts[index]);
+                },
+                childCount: _feedPosts.length,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildCreatePostComposer() {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      color: AppTheme.surface,
-      child: Column(
+      margin: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
         children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(12, 12, 12, 10),
-            child: Row(
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.surfaceAlt,
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.vendorName.isNotEmpty
-                          ? widget.vendorName[0].toUpperCase()
-                          : 'V',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: AppTheme.primarySoft,
-                      ),
-                    ),
-                  ),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppTheme.primarySoft,
+            ),
+            child: Center(
+              child: Text(
+                widget.vendorName.isNotEmpty
+                    ? widget.vendorName[0].toUpperCase()
+                    : 'V',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: _openCreatePostPage,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surfaceAlt,
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                      child: Text(
-                        "What's on your mind, ${widget.vendorName}?",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppTheme.textSecondary,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-          Divider(height: 1, thickness: 1, color: AppTheme.border),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildActionButton(
-                    icon: Icons.photo_library,
-                    label: 'Photo',
-                    color: Color(0xFF22C55E),
-                    onTap: () => _showActionMessage('Photo picker tapped'),
-                  ),
+          SizedBox(width: 10),
+          Expanded(
+            child: GestureDetector(
+              onTap: _openCreatePostPage,
+              child: Text(
+                "What's new?",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
                 ),
-                Container(width: 1, height: 20, color: AppTheme.border),
-                Expanded(
-                  child: _buildActionButton(
-                    icon: Icons.movie_filter,
-                    label: 'video',
-                    color: Color(0xFFF97316),
-                    onTap: () => _showActionMessage('Video picker tapped'),
-                  ),
-                ),
-              ],
+              ),
+            ),
+          ),
+          SizedBox(width: 8),
+          GestureDetector(
+            onTap: _openCreatePostPage,
+            child: Icon(
+              Icons.add_circle_outline,
+              color: AppTheme.primarySoft,
+              size: 24,
             ),
           ),
         ],
@@ -249,12 +264,93 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     );
   }
 
-  Widget _buildFeedPost(FeedPost post) {
+  Widget _buildCommunitiesSection() {
+    final List<Map<String, dynamic>> communities = [
+      {'name': 'Electronics', 'icon': Icons.devices, 'color': Color(0xFF2196F3)},
+      {'name': 'Services', 'icon': Icons.build, 'color': Color(0xFF4CAF50)},
+      {'name': 'Accessories', 'icon': Icons.shopping_bag, 'color': Color(0xFFFF9800)},
+      {'name': 'Repair', 'icon': Icons.handyman, 'color': Color(0xFFE91E63)},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'Categories',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.textPrimary,
+            ),
+          ),
+        ),
+        SizedBox(height: 12),
+        SizedBox(
+          height: 90,
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            scrollDirection: Axis.horizontal,
+            itemCount: communities.length,
+            itemBuilder: (context, index) {
+              final community = communities[index];
+              return Padding(
+                padding: EdgeInsets.only(right: 12),
+                child: GestureDetector(
+                  onTap: () => _showActionMessage('${community['name']} tapped'),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 64,
+                        height: 64,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: (community['color'] as Color).withOpacity(0.1),
+                          border: Border.all(
+                            color: (community['color'] as Color).withOpacity(0.3),
+                          ),
+                        ),
+                        child: Icon(
+                          community['icon'] as IconData,
+                          color: community['color'] as Color,
+                          size: 28,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        community['name'] as String,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildModernFeedPost(FeedPost post) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        border: Border(bottom: BorderSide(color: AppTheme.border, width: 1)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.border),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -267,8 +363,8 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppTheme.primary,
                     shape: BoxShape.circle,
+                    color: AppTheme.primarySoft,
                   ),
                   child: Center(
                     child: Text(
@@ -281,7 +377,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                     ),
                   ),
                 ),
-                SizedBox(width: 12),
+                SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,7 +385,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                       Text(
                         post.vendorName,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppTheme.textPrimary,
                         ),
@@ -297,27 +393,8 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                       Text(
                         post.timeAgo,
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           color: AppTheme.textSecondary,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
-                        ),
-                        decoration: BoxDecoration(
-                          color: AppTheme.surfaceAlt,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          post.communityName,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppTheme.primarySoft,
-                            fontWeight: FontWeight.w600,
-                          ),
                         ),
                       ),
                     ],
@@ -333,109 +410,79 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
                     size: 20,
                   ),
                 ),
-                SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () =>
-                      _showActionMessage('More options for ${post.vendorName}'),
-                  child: Icon(
-                    Icons.more_horiz,
-                    color: AppTheme.textSecondary,
-                    size: 20,
-                  ),
-                ),
               ],
             ),
           ),
-          InkWell(
-            onTap: () => _openPostDetail(post),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        post.title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        post.description,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppTheme.textSecondary,
-                          height: 1.4,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                Text(
+                  post.title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
                   ),
                 ),
-                _buildPostMediaGrid(post),
+                SizedBox(height: 6),
+                Text(
+                  post.description,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppTheme.textSecondary,
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
+          if (post.imagePaths.isNotEmpty || post.mediaIcons.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(top: 12),
+              child: _buildPostMediaGrid(post),
+            ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: EdgeInsets.all(12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  '${post.likes} Likes',
-                  style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
-                ),
-                Text(
-                  '${post.comments} Comments • ${post.shares} Shares',
-                  style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
-                ),
+                _buildStatChip('${post.likes}', 'Likes'),
+                _buildStatChip('${post.comments}', 'Comments'),
+                _buildStatChip('${post.shares}', 'Shares'),
               ],
             ),
           ),
+          Divider(height: 1, thickness: 1, color: AppTheme.border),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: EdgeInsets.symmetric(vertical: 8),
             child: Row(
               children: [
                 Expanded(
-                  child: _buildActionButton(
-                    icon: post.isLiked
-                        ? Icons.favorite
-                        : Icons.favorite_outline,
+                  child: _buildPostAction(
+                    icon: post.isLiked ? Icons.favorite : Icons.favorite_border,
                     label: 'Like',
-                    color: post.isLiked ? AppTheme.primary : AppTheme.textSecondary,
                     onTap: () => _toggleLike(post.id),
+                    color: post.isLiked ? Colors.red : AppTheme.textSecondary,
                   ),
                 ),
                 Expanded(
-                  child: _buildActionButton(
+                  child: _buildPostAction(
                     icon: Icons.chat_bubble_outline,
                     label: 'Comment',
+                    onTap: () => _openPostDetail(post),
                     color: AppTheme.textSecondary,
-                    onTap: () => _addComment(post.id),
                   ),
                 ),
                 Expanded(
-                  child: _buildActionButton(
+                  child: _buildPostAction(
                     icon: Icons.share_outlined,
                     label: 'Share',
-                    color: AppTheme.textSecondary,
                     onTap: () => _sharePost(post.id),
-                  ),
-                ),
-                Expanded(
-                  child: _buildActionButton(
-                    icon: post.isSaved ? Icons.bookmark : Icons.bookmark_border,
-                    label: 'Save',
-                    color: post.isSaved
-                        ? AppTheme.primarySoft
-                        : AppTheme.textSecondary,
-                    onTap: () => _toggleSave(post.id),
+                    color: AppTheme.textSecondary,
                   ),
                 ),
               ],
@@ -446,8 +493,62 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     );
   }
 
+  Widget _buildStatChip(String value, String label) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: AppTheme.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPostAction({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required Color color,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 18, color: color),
+            SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildPostMediaGrid(FeedPost post) {
-    final int total = post.mediaIcons.length;
+    // Prioritize actual images if available, otherwise fall back to icons
+    final bool hasImages = post.imagePaths.isNotEmpty;
+    final int total = hasImages ? post.imagePaths.length : post.mediaIcons.length;
+    
     if (total == 0) {
       return SizedBox.shrink();
     }
@@ -460,7 +561,9 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            _buildMediaTile(post.mediaIcons[index], index),
+            hasImages
+                ? _buildImageTile(post.imagePaths[index])
+                : _buildMediaTile(post.mediaIcons[index], index),
             if (showOverlay && remaining > 0)
               Container(
                 decoration: BoxDecoration(
@@ -577,6 +680,32 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
     );
   }
 
+  Widget _buildImageTile(String imagePath) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+        color: AppTheme.surfaceAlt,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.file(
+          File(imagePath),
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Container(
+            color: AppTheme.surfaceAlt,
+            child: Center(
+              child: Icon(
+                Icons.image_not_supported,
+                color: AppTheme.textSecondary,
+                size: 36,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildActionButton({
     required IconData icon,
     required String label,
@@ -613,21 +742,25 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
       ),
     );
 
-    final String createdText;
-    final String createdCommunity;
+    String createdTitle = '';
+    String createdText = '';
+    String createdCommunity = '';
+    List<String> imagePaths = [];
 
-    if (createdPost is String) {
-      createdText = createdPost.trim();
-      createdCommunity = 'Public';
-    } else if (createdPost is Map) {
+    if (createdPost is Map) {
+      createdTitle = (createdPost['title']?.toString() ?? '').trim();
       createdText = (createdPost['text']?.toString() ?? '').trim();
       createdCommunity = (createdPost['community']?.toString() ?? 'Public')
           .trim();
+      final dynamic rawImagePaths = createdPost['imagePaths'];
+      imagePaths = rawImagePaths is List
+          ? rawImagePaths.map((path) => path.toString()).toList()
+          : [];
     } else {
       return;
     }
 
-    if (!mounted || createdText.isEmpty) {
+    if (!mounted || createdTitle.isEmpty) {
       return;
     }
 
@@ -641,9 +774,10 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
               ? widget.vendorName[0].toUpperCase()
               : 'V',
           communityName: createdCommunity.isEmpty ? 'Public' : createdCommunity,
-          title: 'New Post',
+          title: createdTitle,
           description: createdText,
           mediaIcons: [],
+          imagePaths: imagePaths,
           likes: 0,
           comments: 0,
           shares: 0,
@@ -655,6 +789,7 @@ class _HomeFeedScreenState extends State<HomeFeedScreen> {
       );
     });
     _saveFeedPosts();
+    _showActionMessage('Post created successfully!');
   }
 
   void _openPostDetail(FeedPost post, {int initialPage = 0}) {
