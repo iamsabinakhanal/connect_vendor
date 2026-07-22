@@ -12,6 +12,6 @@ Future<void> main() async {
     debugShowCheckedModeBanner: false,
     theme: AppTheme.dark,
     darkTheme: AppTheme.dark,
-    themeMode: ThemeMode.dark,
+    themeMode: ThemeMode.light,
   ));
 }
