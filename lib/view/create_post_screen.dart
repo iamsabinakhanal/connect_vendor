@@ -14,10 +14,12 @@ class CreatePostScreen extends StatefulWidget {
 }
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
-  late final TextEditingController _postController;
+  late final TextEditingController _titleController;
+  late final TextEditingController _descriptionController;
   late final ImagePicker _imagePicker;
   final List<XFile> _selectedImages = <XFile>[];
   String _selectedCommunity = 'Public';
+  String _selectedCategory = 'Electronics';
 
   static const List<String> _communityOptions = [
     'Public',
@@ -27,16 +29,27 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     'Quick',
   ];
 
+  static const List<String> _categoryOptions = [
+    'Electronics',
+    'Accessories',
+    'Services',
+    'Repair Parts',
+    'Software',
+    'Other',
+  ];
+
   @override
   void initState() {
     super.initState();
-    _postController = TextEditingController();
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
     _imagePicker = ImagePicker();
   }
 
   @override
   void dispose() {
-    _postController.dispose();
+    _titleController.dispose();
+    _descriptionController.dispose();
     super.dispose();
   }
 
@@ -152,26 +165,76 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 ),
               ),
               const SizedBox(height: 16),
+              // Title Field
+              TextField(
+                controller: _titleController,
+                decoration: InputDecoration(
+                  labelText: 'Product Title *',
+                  hintText: 'Enter product name',
+                  labelStyle: TextStyle(color: AppTheme.textSecondary),
+                  hintStyle: TextStyle(color: AppTheme.textSecondary),
+                  filled: true,
+                  fillColor: AppTheme.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: AppTheme.border),
+                  ),
+                ),
+                style: TextStyle(fontSize: 14, color: AppTheme.textPrimary),
+              ),
+              const SizedBox(height: 12),
+              // Category Picker
+              GestureDetector(
+                onTap: _pickCategory,
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _selectedCategory,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppTheme.textPrimary,
+                        ),
+                      ),
+                      Icon(Icons.arrow_drop_down, color: AppTheme.textSecondary),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Description Field
               Container(
-                height: 360,
-                padding: const EdgeInsets.all(14),
+                height: 200,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppTheme.surface,
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppTheme.border),
                 ),
                 child: TextField(
-                  controller: _postController,
+                  controller: _descriptionController,
                   maxLines: null,
                   expands: true,
                   textAlignVertical: TextAlignVertical.top,
                   decoration: InputDecoration(
-                    hintText: "What's on your mind, ${widget.vendorName}?",
+                    hintText: 'Product details, features, condition, etc.',
                     hintStyle: TextStyle(color: AppTheme.textSecondary),
                     border: InputBorder.none,
                   ),
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     color: AppTheme.textPrimary,
                   ),
                 ),
@@ -236,8 +299,16 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 children: [
                   Expanded(
                     child: _buildPostActionIcon(
+                      Icons.camera_alt_outlined,
+                      'Camera',
+                      onTap: _captureImage,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _buildPostActionIcon(
                       Icons.image_outlined,
-                      'Photo/Video',
+                      'Gallery',
                       onTap: _pickImages,
                     ),
                   ),
@@ -245,7 +316,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   Expanded(
                     child: _buildPostActionIcon(
                       Icons.group_add_outlined,
-                      'Add to Community',
+                      'Community',
                       onTap: _pickCommunity,
                     ),
                   ),
@@ -327,6 +398,28 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     });
   }
 
+  Future<void> _captureImage() async {
+    final XFile? captured = await _imagePicker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 85,
+    );
+
+    if (!mounted || captured == null) {
+      return;
+    }
+
+    setState(() {
+      _selectedImages.add(captured);
+    });
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Image captured successfully'),
+        duration: Duration(milliseconds: 800),
+      ),
+    );
+  }
+
   void _removeImage(int index) {
     if (index < 0 || index >= _selectedImages.length) {
       return;
@@ -390,11 +483,23 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   void _submitPost() {
-    final String text = _postController.text.trim();
-    if (text.isEmpty && _selectedImages.isEmpty) {
+    final String title = _titleController.text.trim();
+    final String description = _descriptionController.text.trim();
+    
+    if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Add some text or at least one image before posting.'),
+        const SnackBar(
+          content: Text('Please enter a product title.'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      return;
+    }
+
+    if (description.isEmpty && _selectedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Add a description or at least one image before posting.'),
           duration: Duration(seconds: 1),
         ),
       );
@@ -402,9 +507,57 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     }
 
     Navigator.of(context).pop({
-      'text': text,
+      'title': title,
+      'text': description,
+      'category': _selectedCategory,
       'community': _selectedCommunity,
       'imagePaths': _selectedImages.map((x) => x.path).toList(),
     });
+  }
+
+  void _pickCategory() {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppTheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Select Category',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              ..._categoryOptions.map((category) {
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(Icons.category, color: AppTheme.primarySoft),
+                  title: Text(category),
+                  trailing: _selectedCategory == category
+                      ? Icon(Icons.check_circle, color: AppTheme.primarySoft)
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      _selectedCategory = category;
+                    });
+                    Navigator.pop(context);
+                  },
+                );
+              }),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
