@@ -52,7 +52,7 @@ class FirstOnboardingScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome to\nPasaley Guff',
+                  'Welcome to\nConnect Vendor',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

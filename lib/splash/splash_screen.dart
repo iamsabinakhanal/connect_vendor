@@ -134,7 +134,7 @@ class _SplashScreenState extends State<SplashScreen>
                       SizedBox(height: 30),
                       // App Name
                       Text(
-                        'Pasaley Guff',
+                        'CConnect Vendor',
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
